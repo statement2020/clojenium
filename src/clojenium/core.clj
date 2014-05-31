@@ -17,7 +17,14 @@
   [^WebElement element keys]
   (.sendKeys element keys))
 
+;; TODO WebElements -> data
+
+;;TODO WebDriver -> data where poss
+
+
 (def kw->by
+  "Returns a function that when invoked
+  returns a WebDriver By, to find WebElements on a page"
   {:css #(By/cssSelector %)
    :id #(By/id %)
    :link-text #(By/id %)
@@ -40,13 +47,32 @@
   ([driver by selector]
    (.findElement driver (kw->by by) selector)))
 
-(defn set-driver!
-  [kw]
-  {:chrome (ChromeDriver.)
-   :firefox (FirefoxDriver.)
-   :ie (InternetExplorerDriver.)})
+(defn element+action
+  [driver selector f]
+  (-> driver (find-element selector)
+      f))
+
+(defn element+click
+  [driver [selector]]
+  (element+action driver selector click))
+
+(defn element+clear
+  [driver [selector]]
+  (element+action driver selector clear))
+
+(defn element+send-keys
+  [driver [selector keys]]
+  (element+action driver selector (send-keys keys)))
+
+(def kw->driver
+  "Returns a function which when called will
+   instantiate a driver based on keyword"
+  {:chrome #(ChromeDriver.)
+   :firefox #(FirefoxDriver.)
+   :ie #(InternetExplorerDriver.)})
 
 (defn navigate-to
+  "Navigates to a url"
   [^RemoteWebDriver driver url]
   (.get driver url))
 
@@ -54,7 +80,7 @@
   "Takes a driver kw, and a url, navigates to the url,
   and returns the driver for future use."
   [kw url]
-  (let [driver (set-driver! kw)]
+  (let [driver ((kw->driver kw))]
     (-> driver
         (navigate-to url))
     driver))
