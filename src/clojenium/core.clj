@@ -66,13 +66,13 @@
 
 (def kw->driver
   "Returns a function which when called will
-   instantiate a driver based on keyword"
+   instantiate a driver based on keyword."
   {:chrome #(ChromeDriver.)
    :firefox #(FirefoxDriver.)
    :ie #(InternetExplorerDriver.)})
 
 (defn navigate-to
-  "Navigates to a url"
+  "Navigates to a url."
   [^RemoteWebDriver driver url]
   (.get driver url))
 
